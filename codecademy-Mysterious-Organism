@@ -1,0 +1,111 @@
+// Returns a random DNA base
+const returnRandBase = () => {
+  const dnaBases = ['A', 'T', 'C', 'G']
+  return dnaBases[Math.floor(Math.random() * 4)] 
+}
+
+// Returns a random single stand of DNA containing 15 bases
+const mockUpStrand = () => {
+  const newStrand = []
+  for (let i = 0; i < 15; i++) {
+    newStrand.push(returnRandBase())
+  }
+  return newStrand
+}
+
+//Factory function of P. arquor variations
+const pAequorFactory = (specimenNum,dna) => {
+  return {
+    specimenNum,
+    dna,
+    //method that mutates a random base
+    mutate() {
+      const selectedBase = Math.floor(Math.random() * 15);
+      let randBase = 0;
+      do {
+        randBase = returnRandBase();
+      } while(randBase === this.dna[selectedBase]);
+      this.dna[selectedBase] = randBase;
+      return this.dna;
+    },
+    //method that compares 2 differente pAequor specimens
+    compareDNA(otherPAequor) {
+      let commonBases = 0
+      for (let i = 0; i < 15; i++ ) {
+        if(this.dna[i] === otherPAequor.dna[i]){
+          commonBases++;
+        }
+      }
+      const percentageOfCommonBases = (commonBases*100)/15;
+      return percentageOfCommonBases;
+      //console.log( `specimen ${this.specimenNum} and specimen ${otherPAequor.specimenNum} have ${percentageOfCommonBases}% DNA in common. ` )
+    },
+    //specimens chance of survival
+    willLikelySurvive(){
+      let baseIsCorG = 0;
+      for (let i = 0; i < 15; i++ ) {
+        if (this.dna[i] === 'C' || this.dna[i] === 'G'){
+          baseIsCorG++;
+        }
+      }
+      const percentageOfCorG = baseIsCorG/15;
+      if (percentageOfCorG >= 0.6 ){
+        return true;
+      } else {
+        return false;
+      }
+    },
+    //methos that returns the complementary strand of DNA
+    complementStrand(){
+      const complementStrand = [];
+      for (let i=0; i <= this.dna.length; i++){
+        if(this.dna[i] === 'A'){
+          complementStrand.push('T');
+        } else if (this.dna[i] === 'T'){
+          complementStrand.push('A');
+      } else if (this.dna[i] === 'G'){
+          complementStrand.push('C');
+    } else if (this.dna[i] === 'C'){
+          complementStrand.push('G');
+  }
+}
+      return complementStrand;
+    }
+  }
+}
+
+//Sample of 30 different pAequor specimens
+
+const pAequorSample = [];
+for (let i = 0; i < 30; i++){
+  let newSpecimen = 0;
+  do {
+    newSpecimen = pAequorFactory(i+1,mockUpStrand());
+  } while (newSpecimen.willLikelySurvive() === true);
+  pAequorSample.push(newSpecimen);
+}
+
+//Find the 2 most related specimens
+let firstSpecimenIndex = 0;
+let secondSpecimenIndex = 0;
+let relatedness = 0;
+
+for (let i = 0; i < 15; i++){
+  for (let j = 0; j < 15; j++){
+   const newRelatedness = pAequorSample[i].compareDNA(pAequorSample[j]);
+   if (newRelatedness > relatedness && newRelatedness < 100) {
+     relatedness = newRelatedness;
+     firstSpecimenIndex = i;
+     secondSpecimenIndex = j;
+   }
+  }
+}
+
+console.log( `The most related specimens are specimen ${pAequorSample[firstSpecimenIndex].specimenNum} and specimen ${pAequorSample[secondSpecimenIndex].specimenNum}. They are ${relatedness}% alike. ` );
+
+
+
+
+
+
+
